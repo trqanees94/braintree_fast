@@ -1,0 +1,122 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="wrapper">
+  <div id="response-container" class="response container">
+    <div class="content">
+      <div class="icon">
+        <img src="/static/images/{{ result['icon'] }}.svg" alt="">
+      </div>
+
+      <h1>{{ result['header'] }}</h1>
+      <section>
+        <p>{{ result['message'] }}</p>
+      </section>
+
+      <section>
+        <a class="button primary back" href="/checkouts/new">
+          <span>Back To Home Page</span>
+        </a>
+      </section>
+    </div>
+  </div>
+</div>
+
+<aside class="drawer dark">
+  <header>
+    <div class="content compact">
+      <a href="https://developers.braintreepayments.com" class="braintree" target="_blank">Braintree</a>
+      <h3>API Response</h3>
+    </div>
+  </header>
+
+  <article class="content compact">
+    <section>
+      <h5>Customer</h5>
+
+      {% for customer in customers.items %}
+        
+          <table cellpadding="3" cellspacing="0">
+            <tbody>
+              <tr>
+                <td>id</td>
+                <td class="nr">{{ customer.id }}</td>
+                <td>
+                  <button type="button" class="use-address" /> 
+                </td>
+              </tr>
+
+              <tr>
+                <td>first name</td>
+                <td>{{ customer.first_name }}</td>
+              </tr>
+
+              <tr>
+                <td>created_at</td>
+                <td>{{ customer.created_at }}</td>
+              </tr>
+
+            </tbody>
+          </table>
+
+       
+      {% endfor %}
+
+    </section>
+
+    <section>
+      <p class="center small">Integrate with the Braintree SDK for a secure and seamless checkout</p>
+    </section>
+
+    <section>
+      <a class="button secondary full" href="https://developers.braintreepayments.com/guides/drop-in" target="_blank">
+        <span>See the Docs</span>
+      </a>
+    </section>
+  </article>
+</aside>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+
+$(".use-address").click(function() {
+    var $row = $(this).closest("tr");    // Find the row
+    var $text = $row.find(".nr").text(); // Find the text
+    var customer_request = {
+      "customer_id"  :  $text
+    }
+
+
+    $.ajax({
+        url: "/update-admin-customer",
+        type : 'POST',
+        data: customer_request,
+        success: function(result){
+            //console.log(result);
+            //console.log('https://www.getevolved.com/');
+            window.location.href = '/customer/update.html';
+           
+        }
+    })
+
+    
+});
+
+
+// function myFunction(x) {
+//   // alert("x " + x.cells[0].innertext);
+
+//   var $row = $(this).closest("tr");    // Find the row
+//   var $text = $row.find(".nr").text(); // Find the text
+//   // Let's test it out
+//   alert($text);
+
+// }
+  
+</script>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="wrapper">
+    <div id="response-container" class="response container">
+        <div class="content">
+        <div class="icon">
+            <img src="/static/images/{{ result['icon'] }}.svg" alt="">
+        </div>
+    
+        <h1>{{ result['header'] }}</h1>
+        <section>
+            <p>{{ result['message'] }}</p>
+        </section>
+    
+        <section>
+            <a class="button primary back" href="/checkouts/new">
+            <span>Back To Home Page</span>
+            </a>
+        </section>
+        </div>
+    </div>
+
+
+    <div id="update-customer-container" class="update customer container">
+        <div class="content">
+    
+        <h1>{{ customer['first_name'] }}</h1>
+        <section>
+            <p>{{ customer['last_name'] }}</p>
+        </section>
+        <section>
+            <p>{{ customer['created_at'] }}</p>
+        </section>
+    
+        <section>
+            <a class="button primary back" href="/checkouts/new">
+            <span>Back To Home Page</span>
+            </a>
+        </section>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="https://js.braintreegateway.com/web/dropin/1.22.1/js/dropin.min.js"></script>
+<script>
+
+  var update_customer_form = document.querySelector('#update-customer-form');
+  var client_token = '{{ client_token }}';
+
+  braintree.dropin.create({
+    authorization: client_token,
+    container: '#bt-dropin',
+    paypal: {
+      flow: 'vault'
+    }
+  }, function (createErr, instance) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      instance.requestPaymentMethod(function (err, payload) {
+        if (err) {
+          console.log('Error', err);
+          return;
+        }
+
+        // Add the nonce to the form and submit
+        document.querySelector('#nonce').value = payload.nonce;
+        
+        update_customer_form.submit();
+      });
+    });
+  });
+</script>
+{% endblock %}
