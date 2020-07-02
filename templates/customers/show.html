@@ -93,9 +93,12 @@ $(".use-address").click(function() {
         type : 'POST',
         data: customer_request,
         success: function(result){
-            //console.log(result);
-            //console.log('https://www.getevolved.com/');
-            window.location.href = '/customer/update.html';
+            // console.log(result);
+            // console.log('https://www.getevolved.com/');
+            window.location.href = 'https://www.getevolved.com/';
+            // alert(result)
+            // window.location.href = '/checkouts/new.html';
+            // $(this).html(result);
            
         }
     })
