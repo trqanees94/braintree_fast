@@ -65,7 +65,7 @@ def create_customer():
     customer_response = customer.create(request)
 
     if customer_response["success"]:
-        return redirect(url_for('show_customer',customer_id=customer_response["data"].customer.id))
+        return redirect(url_for('show_customer',customer_id=customer_response["braintree_data"].customer.id))
     else:
         flash('Error: %s: %s' % (customer_response["error"]["error_code"], customer_response["error"]["error_message"]))
         return redirect(url_for('new_checkout'))

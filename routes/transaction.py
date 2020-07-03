@@ -43,13 +43,16 @@ def create(transaction_request):
 
             # open database connection
             with MongoDB() as mongo_client: # add the transaction to the collection
-                transaction_record = {
+                transaction_pair = {
                     "braintree":{
                         "braintree_transaction_id":braintree_transaction_id,
                         "braintree_transaction_amount":braintree_transaction_amount
+                    },
+                    "stripe":{
+                        
                     }
                 }
-            transaction_object = mongo_client.transactions.insert_one(transaction_record)
+            transaction_object = mongo_client.transactions.insert_one(transaction_pair)
     
 
     transaction_response = {

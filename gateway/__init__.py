@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import braintree
-
 import stripe
 
 gateway = braintree.BraintreeGateway(
@@ -15,8 +14,13 @@ gateway = braintree.BraintreeGateway(
 
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 
-def stripe_customer(options):
-    return gateway.customer.create(options)
+def stripe_customer(name,spending_limit):
+    return stripe.Customer.create(
+        name= name,
+        metadata =  {
+            "spending_limit": spending_limit
+        }
+    )
 
 
 
