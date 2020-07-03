@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 import braintree
 
+import stripe
+
 gateway = braintree.BraintreeGateway(
     braintree.Configuration(
         environment=os.environ.get('BT_ENVIRONMENT'),
@@ -10,6 +12,14 @@ gateway = braintree.BraintreeGateway(
         private_key=os.environ.get('BT_PRIVATE_KEY')
     )
 )
+
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+
+def stripe_customer(options):
+    return gateway.customer.create(options)
+
+
+
 
 def generate_client_token():
     return gateway.client_token.generate()
@@ -28,3 +38,5 @@ def find_customer(id):
 
 def find_all_customers():
     return gateway.customer.search([])
+
+

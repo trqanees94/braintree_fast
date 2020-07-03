@@ -31,11 +31,10 @@
   </header>
 
   <article class="content compact">
+    <form id="update-customer-form" method="post" action="/update-admin-customer">
     <section>
       <h5>Customer</h5>
-
       {% for customer in customers.items %}
-        
           <table cellpadding="3" cellspacing="0">
             <tbody>
               <tr>
@@ -45,24 +44,19 @@
                   <button type="button" class="use-address" /> 
                 </td>
               </tr>
-
               <tr>
                 <td>first name</td>
                 <td>{{ customer.first_name }}</td>
               </tr>
-
               <tr>
                 <td>created_at</td>
                 <td>{{ customer.created_at }}</td>
               </tr>
-
             </tbody>
           </table>
-
-       
       {% endfor %}
-
     </section>
+    </form>
 
     <section>
       <p class="center small">Integrate with the Braintree SDK for a secure and seamless checkout</p>
@@ -87,35 +81,29 @@ $(".use-address").click(function() {
       "customer_id"  :  $text
     }
 
+    var form = document.querySelector('#update-customer-form');
+    form.submit()
 
-    $.ajax({
-        url: "/update-admin-customer",
-        type : 'POST',
-        data: customer_request,
-        success: function(result){
-            // console.log(result);
-            // console.log('https://www.getevolved.com/');
-            window.location.href = 'https://www.getevolved.com/';
-            // alert(result)
-            // window.location.href = '/checkouts/new.html';
-            // $(this).html(result);
+
+
+    // $.ajax({
+    //     url: "/update-admin-customer",
+    //     type : 'POST',
+    //     data: customer_request,
+    //     success: function(result){
+    //         // console.log(result);
+    //         // console.log('https://www.getevolved.com/');
+    //         window.location.href = 'https://www.getevolved.com/';
+    //         // alert(result)
+    //         // window.location.href = '/checkouts/new.html';
+    //         // $(this).html(result);
            
-        }
-    })
+    //     }
+    // })
 
     
 });
 
-
-// function myFunction(x) {
-//   // alert("x " + x.cells[0].innertext);
-
-//   var $row = $(this).closest("tr");    // Find the row
-//   var $text = $row.find(".nr").text(); // Find the text
-//   // Let's test it out
-//   alert($text);
-
-// }
   
 </script>
 

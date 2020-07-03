@@ -13,6 +13,7 @@
 
 # clients
 import os, pymongo
+from pymongo import MongoClient
 
 # data types
 from bson import ObjectId
@@ -26,6 +27,9 @@ from typing import List, Union
 # utils
 from time import sleep, time
 
+#certificate verification
+import ssl
+
 
 class MongoDB:
     
@@ -35,19 +39,20 @@ class MongoDB:
     
     def __init__(self):
         
-        MONGO_URI = "mongodb+srv://{}:{}@{}".format(os.environ["MONGO_USERNAME"], os.environ["MONGO_PASSWORD"], os.environ["MONGO_HOST"])
-        mongo_client = pymongo.MongoClient(MONGO_URI)
+        MONGO_URI = "mongodb+srv://{}:{}@{}".format(os.environ["MONGO_USERNAME"],os.environ["MONGO_PASSWORD"],os.environ["MONGO_HOST"])
+
+        mongo_client = pymongo.MongoClient(MONGO_URI, ssl_cert_reqs=ssl.CERT_NONE)
         self.mongo_client = mongo_client
         
         # bind collections
-        self.transaction = MongoCollection(self.mongo_client, "transactions")
-        self.customer = MongoCollection(self.mongo_client, "customers")
+        self.transactions = MongoCollection(self.mongo_client, "transactions")
+        self.customers = MongoCollection(self.mongo_client, "customers")
     
     def __enter__(self) -> "MongoDB":
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.client.__exit__(exc_type, exc_val, exc_tb)
+        self.mongo_client.__exit__(exc_type, exc_val, exc_tb)
 
 
 class MongoCollection:

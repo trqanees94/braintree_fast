@@ -7,7 +7,6 @@ from gateway import generate_client_token, transact, find_transaction, find_cust
 # flask
 from flask import jsonify, Response
 
-
 def create(customer_request):
     ''' Store customer transaction to mongo '''
 
@@ -27,15 +26,26 @@ def create(customer_request):
             }
     else:
         error_dict = {}
+
+        braintree_customer_id = data.customer.id
+        braintree_customer_first_name = data.customer.first_name
+        braintree_customer_last_name = data.customer.last_name
+        braintree_customer_spending_limit = data.customer.custom_fields["spending_limit"]
         
         # open database connection
         with MongoDB() as mongo_client: # add the transaction to the collection
-            customer_object = mongo_client.customer.count()
-            print("customer_object: ", customer_object)
-
-
+            customer_object = {
+                "braintree":{
+                    "customer_id: ": braintree_customer_id,
+                    "customer_first_name: ": braintree_customer_first_name,
+                    "customer_last_name: ": braintree_customer_last_name,
+                    "customer_spending_limit: ": braintree_customer_spending_limit
+                }
+            }
+            customer_object = mongo_client.customers.insert_one(customer_object)
 
     customer_response = {
+        "fast_customer_id": None if error_dict else str(customer_object["_id"]),
         "data": {} if error_dict else data,
         "error": error_dict,
         "success": bool(not error_dict)

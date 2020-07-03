@@ -49,6 +49,9 @@ def create_checkout():
 
     transaction_response = transaction.create(request)
 
+    print("def create_checkout():")
+    print(transaction_response)
+
     if transaction_response["success"]:
         return redirect(url_for('show_checkout',transaction_id=transaction_response["data"].transaction.id))
     else:
@@ -82,7 +85,6 @@ def create_child_transaction():
             'message': 'Create Parental Control Transaction.'
     }
     return render_template('checkouts/child_checkout.html', customers=customers_list, client_token=client_token, result=result)
-
 
 
 @app.route('/checkouts/<transaction_id>', methods=['GET'])
@@ -135,7 +137,6 @@ def show_all_customers():
     return render_template('customers/show.html', customers=customers, result=result)
 
 
-
 @app.route('/admin-customer', methods=['get'])
 def admin_customer():
     customers = find_all_customers()
@@ -155,6 +156,10 @@ def admin_customer():
 
 @app.route('/update-admin-customer', methods=['POST'])
 def update_admin_customer():
+
+    print("def update_admin_customer()")
+    print(request.form)
+
 
     customer_id = request.form['customer_id']
     # print("customer_id:")

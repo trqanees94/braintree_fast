@@ -1525,6 +1525,9 @@ footer {
   overflow: auto;
   z-index: 0;
   padding: 4em 0;
+  display:flex;
+  flex-direction: row;
+  flex-wrap:wrap;
 }
 
 @media (min-width: 1025px) {
@@ -1543,13 +1546,31 @@ footer {
     -moz-flex: 1 1 auto;
     -ms-flex: 1 1 auto;
     flex: 1 1 auto;
+    flex-direction: row;
+    flex-wrap:wrap;
   }
+}
+
+#first_name  {
+    border:1px solid #ccc;
+    margin: 8px 16px;
+    padding-left: 16px;
+  }
+#last_name  {
+  border:1px solid #ccc;
+  margin: 8px 16px;
+  padding-left: 16px;
+}
+#spending_limit  {
+  border:1px solid #ccc;
+  margin: 8px 16px;
+  padding-left: 16px;
 }
 
 .container {
   max-width: 46em;
-  margin: 0 auto;
-  width: 100%;
+  /* margin: 0 auto; */
+  width: 50%;
 }
 
 .container.wide {
@@ -2519,3 +2540,4 @@ aside.drawer ::selection {
   color: rgba(62, 60, 65, 0.99);
   text-shadow: none;
 }
+
