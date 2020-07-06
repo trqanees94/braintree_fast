@@ -14,20 +14,19 @@ This app is meant to limit customers spending online. As people move away from B
 
 ## Setup Instructions
 
-1. git clone https://github.com/trqanees94/braintree_stripe_fast_app.git
-
-2. Install requirements:
+1. Install requirements:
   ```sh
   pip3 install -r requirements.txt
   ```
 
-3. Start server:
+2. Start server:
   ```sh
   python3 app.py
   ```
 
   By default, this runs the app on port `4567`. You can configure the port by setting the environmental variable `PORT`.
 
+3. Provide Tariq Anees(trqanees94@gmail.com) with your IP address. MongoAtlas Cluster needs to whitelist your IP address. 
 
 ## Running tests
 
