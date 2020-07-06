@@ -69,11 +69,13 @@ class MongoCollection:
         
         return None if not self.collection.insert_one(data) else data
     
-    # def find(self, *args, **kwargs) -> List:
-    #     ''' return an array of objects from the collection. '''
+    def find(self, *args, **kwargs) -> List:
+        ''' return an array of objects from the collection. '''
         
-    #     return [self.object_type.from_bson(result) for result in self.collection.find(*args, **kwargs)]
-    
+        # return [self.object_type.from_bson(result) for result in self.collection.find(*args, **kwargs)]
+        
+        return [result for result in self.collection.find()]
+
     def find_one(self, *args, **kwargs):
         ''' return a single object from the collection. '''
         
@@ -81,15 +83,17 @@ class MongoCollection:
         return None if not result else result
 
     def count(self, *args, **kwargs):
-        ''' return a single object from the collection. '''
+        ''' return number of objects in collection. '''
         
         result = self.collection.count()
+        #new documentation for count()
+
         return None if not result else result
     
-    # def find_by_id(self, id: Union[str, ObjectId]):
-    #     ''' return a single object matching :id:. '''
+    def find_by_id(self, id: Union[str, ObjectId]):
+        ''' return a single object matching :id:. '''
         
-    #     return self.find_one({"_id": ObjectId(id)})
+        return self.find_one({"_id": ObjectId(id)})
     
     # def find_by_ids(self, ids: List[Union[str, ObjectId]]) -> List:
     #     ''' return an array of objects matching the provided :ids: array. '''

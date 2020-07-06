@@ -11,12 +11,26 @@ from flask import jsonify, Response
 def create(transaction_request):
     ''' Store customer transaction to mongo '''
 
-    customer_object = find_customer(transaction_request.form['customer_id'])
-    customer_spending_limit = customer_object.custom_fields["spending_limit"]
+    print("transaction_request.form")
+    print(transaction_request.form)
+
+    fast_customer_id = transaction_request.form["customer_id"]
+
+    with MongoDB() as mongo_client:
+        fast_customer_object = mongo_client.customers.find_by_id(fast_customer_id)
+
+    print("fast_customer_object")
+    print(fast_customer_object)
+
+    
+    # customer_object = find_customer(transaction_request.form['customer_id'])
+    
+    customer_object = find_customer(fast_customer_object['braintree']['customer_id'])
+    customer_spending_limit = fast_customer_object['braintree']["customer_spending_limit"]
 
     if float(transaction_request.form['amount']) > float(customer_spending_limit):
         error_dict = {
-            "error_message": "Transaction Amount: {} Exceeds Limit: {}".format(transaction_request.form['amount'], customer_spending_limit), 
+            "error_message": "Transaction Amount: {} Exceeds Limit: {}".format(transaction_request.form['amount'], customer_spending_limit),
             "error_code": "415"
             }
     
@@ -49,7 +63,7 @@ def create(transaction_request):
                         "braintree_transaction_amount":braintree_transaction_amount
                     },
                     "stripe":{
-                        
+
                     }
                 }
             transaction_object = mongo_client.transactions.insert_one(transaction_pair)

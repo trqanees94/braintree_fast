@@ -25,53 +25,89 @@
     <div id="update-customer-container" class="update customer container">
         <div class="content">
     
-        <h1>{{ customer['first_name'] }}</h1>
+        <h1>{{ customer['customer_first_name'] }}</h1>
+        <h1>{{ customer['customer_last_name'] }}</h1>
+        <h1>Fast ID: {{ customer_id }}</h1>
         <section>
-            <p>{{ customer['last_name'] }}</p>
+            <p>Spending Limit: {{ customer['customer_spending_limit'] }}</p>
         </section>
-        <section>
-            <p>{{ customer['created_at'] }}</p>
-        </section>
+
+        <form id="update-customer-form" method="get" action="/update-stripe-braintree-customer">
+          <section>
+            <div class="labael-wrapper">
+            <label for="first_name">
+              <span class="input-label">First Name</span>
+              <div class="input-wrapper first_name-wrapper">
+                <input id="first_name" name="first_name" type="tel" min="1" placeholder="FirstName">
+                <input id="customer_id" name="customer_id" type="hidden" value="{{customer_id}}">
+              </div>
+            </label>
+            </div>
     
-        <section>
-            <a class="button primary back" href="/checkouts/new">
-            <span>Back To Home Page</span>
-            </a>
-        </section>
+            <div class="labael-wrapper">
+            <label for="last_name">
+              <span class="input-label">Last Name</span>
+              <div class="input-wrapper last_name-wrapper">
+                <input id="last_name" name="last_name" type="tel" min="1" placeholder="LastName">
+              </div>
+            </label>
+            </div>
+    
+    
+            <div class="labael-wrapper">
+              <label for="spending_limit">
+                <span class="input-label">Spending Limit</span>
+                <div class="input-wrapper spending_limit-wrapper">
+                  <input id="spending_limit" name="spending_limit" type="tel" min="1" placeholder="SpendingLimit">
+                </div>
+              </label>
+            </div>
+      
+            <div class="bt-drop-in-wrapper">
+              <div id="bt-dropin"></div>
+            </div>
+          </section>
+      
+          <input type="hidden" id="nonce" name="customer_method_nonce" />
+          <button type="submit" class="submit-button" id="submit-button"><span>Update Customer</span></button>
+        </form>
+
         </div>
     </div>
-
 
 </div>
 
 <script src="https://js.braintreegateway.com/web/dropin/1.22.1/js/dropin.min.js"></script>
 <script>
 
-  var update_customer_form = document.querySelector('#update-customer-form');
-  var client_token = '{{ client_token }}';
 
-  braintree.dropin.create({
-    authorization: client_token,
-    container: '#bt-dropin',
-    paypal: {
-      flow: 'vault'
-    }
-  }, function (createErr, instance) {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
+  $(".submit-button").click(function() {
 
-      instance.requestPaymentMethod(function (err, payload) {
-        if (err) {
-          console.log('Error', err);
-          return;
+    var url = form.attr("action");
+    var formData = $(form).serializeArray();
+
+    alert(url)
+
+     $.ajax({
+        url: "/update-stripe-braintree-customer",
+        type : 'GET',
+        data: customer_request,
+        success: function(result){
+            // console.log(result);
+            // window.location.href = result;
+            // window.location.href = '/checkouts/new.html';
+            // $(this).html(result);
+           
         }
+    })
 
-        // Add the nonce to the form and submit
-        document.querySelector('#nonce').value = payload.nonce;
-        
-        update_customer_form.submit();
-      });
-    });
-  });
+    // var update_customer_form = document.querySelector('#update-customer-form');
+    // update_customer_form.submit()
+
+   
+
+    
+});
+
 </script>
 {% endblock %}

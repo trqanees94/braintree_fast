@@ -31,26 +31,36 @@
   </header>
 
   <article class="content compact">
-    <form id="update-customer-form" method="post" action="/update-admin-customer">
-    <section>
+    <form id="update-customer-form" method="get" action="/update-admin-customer">
+      
+      <select class="customer-dropdown" id="customer_id" name="customer_id">
+        {% for customer in customers %}
+            <option value="{{customer['_id']}}">{{customer['_id']}}</option> 
+        {% endfor %}
+      </select>
+      <button type="button" class="use-address">Update</button>
+
+      <section>
       <h5>Customer</h5>
-      {% for customer in customers.items %}
+      {% for customer in customers %}
           <table cellpadding="3" cellspacing="0">
             <tbody>
               <tr>
-                <td>id</td>
-                <td class="nr">{{ customer.id }}</td>
-                <td>
-                  <button type="button" class="use-address" /> 
-                </td>
+                <td>Fast ID</td>
+                <td class="nr" name="nr" id = "nr">{{ customer['_id'] }}</td>
+                <!-- <td>
+                  <button type="button" class="use-address"></button>
+                </td> -->
               </tr>
               <tr>
-                <td>first name</td>
-                <td>{{ customer.first_name }}</td>
+                <td>Name</td>
+                <td>{{ customer['stripe']['customer_first_name'] }}</td>
+                <td></td>
               </tr>
               <tr>
-                <td>created_at</td>
-                <td>{{ customer.created_at }}</td>
+                <td>Spending Limit</td>
+                <td>{{ customer['stripe']['customer_spending_limit'] }}</td>
+                <td></td>
               </tr>
             </tbody>
           </table>
@@ -75,26 +85,22 @@
 
 
 $(".use-address").click(function() {
-    var $row = $(this).closest("tr");    // Find the row
-    var $text = $row.find(".nr").text(); // Find the text
-    var customer_request = {
-      "customer_id"  :  $text
-    }
+    // var $row = $(this).closest("tr");    // Find the row
+    // var $text = $row.find(".nr").text(); // Find the text
+    // var customer_request = {
+    //   "customer_id"  :  $text
+    // }
 
     var form = document.querySelector('#update-customer-form');
     form.submit()
 
-
-
     // $.ajax({
     //     url: "/update-admin-customer",
-    //     type : 'POST',
+    //     type : 'GET',
     //     data: customer_request,
     //     success: function(result){
     //         // console.log(result);
-    //         // console.log('https://www.getevolved.com/');
-    //         window.location.href = 'https://www.getevolved.com/';
-    //         // alert(result)
+    //         window.location.href = result;
     //         // window.location.href = '/checkouts/new.html';
     //         // $(this).html(result);
            

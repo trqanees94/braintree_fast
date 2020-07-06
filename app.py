@@ -49,9 +49,6 @@ def create_checkout():
 
     transaction_response = transaction.create(request)
 
-    print("def create_checkout():")
-    print(transaction_response)
-
     if transaction_response["success"]:
         return redirect(url_for('show_checkout',transaction_id=transaction_response["data"].transaction.id))
     else:
@@ -65,7 +62,7 @@ def create_customer():
     customer_response = customer.create(request)
 
     if customer_response["success"]:
-        return redirect(url_for('show_customer',customer_id=customer_response["braintree_data"].customer.id))
+        return redirect(url_for('show_customer',customer_id=customer_response["fast_customer_id"]))
     else:
         flash('Error: %s: %s' % (customer_response["error"]["error_code"], customer_response["error"]["error_message"]))
         return redirect(url_for('new_checkout'))
@@ -75,9 +72,10 @@ def create_customer():
 def create_child_transaction():
 
     client_token = generate_client_token()
-    customers = find_all_customers()
-    customers_list = [x.id for x in customers.items]
-    customers_collection_list = [x for x in customers.items]
+    
+
+    customers = customer.retrieve()
+    customers_list = [x for x in customers]
 
     result = {
             'header': 'Sweet Success!',
@@ -109,8 +107,7 @@ def show_checkout(transaction_id):
 
 @app.route('/customer/<customer_id>', methods=['GET'])
 def show_customer(customer_id):
-    customer = find_customer(customer_id)
-    # result = {}
+    customer_object = customer.retrieve(customer_id)[0]
     
     result = {
             'header': 'Sweet Success!',
@@ -118,23 +115,23 @@ def show_customer(customer_id):
             'message': 'Your test customer has been successfully processed.'
     }
 
-    return render_template('customer/show.html', customer=customer, result=result)
+    return render_template('customer/show.html', customer=customer_object, result=result)
 
 
 @app.route('/customers', methods=['GET'])
 def show_all_customers():
-    customers = find_all_customers()
 
-    customers_list = [x for x in customers.items]
+    customers = customer.retrieve()
+    customers_list = [x for x in customers]
+
     message = 'Your children can be successfully viewed.' if len(customers_list)>0 else 'No children exist in the vault'
-
     result = {
             'header': 'Sweet Success!',
             'icon': 'success',
             'message': message
     }
 
-    return render_template('customers/show.html', customers=customers, result=result)
+    return render_template('customers/show.html', customers=customers_list, result=result)
 
 
 @app.route('/admin-customer', methods=['get'])
@@ -154,41 +151,30 @@ def admin_customer():
     return render_template('customers/show.html', customers=customers, result=result)
 
 
-@app.route('/update-admin-customer', methods=['POST'])
+@app.route('/update-admin-customer', methods=['GET'])
 def update_admin_customer():
 
-    print("def update_admin_customer()")
-    print(request.form)
 
+    customer_id = request.args["customer_id"]
+    customer_object = customer.retrieve(customer_id)[0]
+    customer_object = customer_object["braintree"]
 
-    customer_id = request.form['customer_id']
-    # print("customer_id:")
-    # print(customer_id)
-    customer_object = find_customer(customer_id)
-    # print(customer_object)
 
     result = {
             'header': 'Sweet Success!',
             'icon': 'success',
             'message': 'Your customers can be successfully updated.'
     }
+    return render_template('customer/update.html',customer_id=customer_id ,customer=customer_object, result=result)
 
-    return render_template('customer/update.html', result=result ,customer=customer_object)
+
+@app.route('/update-stripe-braintree-customer', methods=['GET'])
+def update_stripe_braintree_customer():
+
+    customer_response = customer.update(request)
+
+    return redirect(url_for('show_customer', customer_id=customer_response["fast_customer_id"]))
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=True)
-
-
-
-
-
-# <form id="update-admin-customer-form" method="post" action="/update_admin_customer">
-#               <input type="hidden" name="customer_id" value='{{ customer.id }}'>
-#             </form>
-# <input type="hidden" name="customer_id" value='{{ customer.id }}'>
-# <tr onclick="document.getElementById('update-admin-customer-form').submit();"></tr>
-
-
-
-# tr onclick="myFunction(this)">

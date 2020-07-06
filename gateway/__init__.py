@@ -22,7 +22,21 @@ def stripe_customer(name,spending_limit):
         }
     )
 
+def update_stripe_customer(customer_id,name,spending_limit):
+    return stripe.Customer.modify(
+        customer_id,
+        name=name,
+        metadata =  {
+            "spending_limit": spending_limit
+        }
+    )
 
+
+def stripe_charge(amount):
+    return stripe.Charge.create(
+        amount=2000,
+        currency="usd",
+    )
 
 
 def generate_client_token():
@@ -33,6 +47,10 @@ def transact(options):
 
 def customer(options):
     return gateway.customer.create(options)
+
+def update_customer(customer_id, params):
+    return gateway.customer.update(customer_id, params)
+
 
 def find_transaction(id):
     return gateway.transaction.find(id)
