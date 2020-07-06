@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/tariqanees/Desktop/braintree_flask_example/venv"
+set -gx VIRTUAL_ENV "/Users/tariqanees/Desktop/braintree_stripe_fast_app/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

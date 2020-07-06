@@ -11,19 +11,13 @@ from flask import jsonify, Response
 def create(transaction_request):
     ''' Store customer transaction to mongo '''
 
-    print("transaction_request.form")
-    print(transaction_request.form)
 
     fast_customer_id = transaction_request.form["customer_id"]
 
     with MongoDB() as mongo_client:
         fast_customer_object = mongo_client.customers.find_by_id(fast_customer_id)
 
-    print("fast_customer_object")
-    print(fast_customer_object)
 
-    
-    # customer_object = find_customer(transaction_request.form['customer_id'])
     
     customer_object = find_customer(fast_customer_object['braintree']['customer_id'])
     customer_spending_limit = fast_customer_object['braintree']["customer_spending_limit"]
@@ -71,7 +65,7 @@ def create(transaction_request):
 
     transaction_response = {
         "fast_transaction_id": None if error_dict else str(transaction_object["_id"]),
-        "data": {} if error_dict else data,
+        "braintree_transaction_id": {} if error_dict else data.transaction.id,
         "error": error_dict,
         "success": bool(not error_dict)
     }

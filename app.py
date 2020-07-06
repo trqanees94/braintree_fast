@@ -50,7 +50,8 @@ def create_checkout():
     transaction_response = transaction.create(request)
 
     if transaction_response["success"]:
-        return redirect(url_for('show_checkout',transaction_id=transaction_response["data"].transaction.id))
+        return redirect(url_for('show_checkout',transaction_id=transaction_response["braintree_transaction_id"]))
+
     else:
         flash('Error: %s: %s' % (transaction_response["error"]["error_code"], transaction_response["error"]["error_message"]))
         return redirect(url_for('new_checkout'))
@@ -60,6 +61,9 @@ def create_checkout():
 def create_customer():
 
     customer_response = customer.create(request)
+
+    print("customer_response")
+    print(customer_response)
 
     if customer_response["success"]:
         return redirect(url_for('show_customer',customer_id=customer_response["fast_customer_id"]))
@@ -72,7 +76,6 @@ def create_customer():
 def create_child_transaction():
 
     client_token = generate_client_token()
-    
 
     customers = customer.retrieve()
     customers_list = [x for x in customers]
@@ -170,8 +173,14 @@ def update_admin_customer():
 
 @app.route('/update-stripe-braintree-customer', methods=['GET'])
 def update_stripe_braintree_customer():
+    print("def update_stripe_braintree_customer():")
+    print("request")
+    print(request)
 
     customer_response = customer.update(request)
+
+    print("customer_response")
+    print(customer_response)
 
     return redirect(url_for('show_customer', customer_id=customer_response["fast_customer_id"]))
 

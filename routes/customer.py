@@ -57,8 +57,8 @@ def create(customer_request):
 
     customer_response = {
         "fast_customer_id": None if error_dict else str(customer_object["_id"]),
-        "braintree_data": {} if error_dict else braintree_data,
-        "stripe_data": {} if error_dict else stripe_data,
+        "braintree_id": {} if error_dict else braintree_data.customer.id,
+        "stripe_id": {} if error_dict else stripe_data.id,
         "error": error_dict,
         "success": bool(not error_dict)
     }
@@ -69,28 +69,17 @@ def create(customer_request):
 def update(customer_request):
     ''' Store customer transaction to mongo '''
     customer_id = customer_request.args["customer_id"]
-    print("customer_id: ", customer_id)
-
 
     updated_first_name=customer_request.args["first_name"]
     updated_last_name=customer_request.args["last_name"]
     updated_spending_limit=customer_request.args["spending_limit"]
 
-    print("updated_first_name: ", updated_first_name)
-    print("updated_last_name: ", updated_last_name)
-    print("updated_spending_limit: ", updated_spending_limit)
-
-
     with MongoDB() as mongo_client:
         customer_object = mongo_client.customers.find_by_id(customer_id)
-        print("customer_object: ", customer_object)
+    
 
         braintree_id = customer_object['braintree']['customer_id']
         stripe_id = customer_object['stripe']['customer_id']
-
-        print("braintree_id: ", braintree_id)
-        print("stripe_id: ", stripe_id)
-
 
     update_params = {
                 "first_name": updated_first_name,
@@ -135,10 +124,18 @@ def update(customer_request):
     else:
         error_dict = {}
 
+    # customer_response = {
+    #     "fast_customer_id": None if error_dict else customer_id,
+    #     "braintree_data": {} if error_dict else braintree_data,
+    #     "stripe_data": {} if error_dict else stripe_data,
+    #     "error": error_dict,
+    #     "success": bool(not error_dict)
+    # }
+
     customer_response = {
-        "fast_customer_id": None if error_dict else customer_id,
-        "braintree_data": {} if error_dict else braintree_data,
-        "stripe_data": {} if error_dict else stripe_data,
+        "fast_customer_id": None if error_dict else str(customer_object["_id"]),
+        "braintree_id": {} if error_dict else braintree_data.customer.id,
+        "stripe_id": {} if error_dict else stripe_data.id,
         "error": error_dict,
         "success": bool(not error_dict)
     }
