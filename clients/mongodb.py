@@ -1,15 +1,4 @@
-""" This module provides a MongoDB object that binds various collections to their respective python object type. """
-
-'''
-    MongoCredentials
-
-    trqanees94
-    keepitsimple
-
-    client = pymongo.MongoClient("mongodb+srv://trqanees94:<password>@cluster0.jnhwe.mongodb.net/<dbname>?retryWrites=true&w=majority")
-    db = client.test
-
-'''
+""" This module provides a MongoDB object that serves a connection to various collections """
 
 # clients
 import os, pymongo
@@ -33,8 +22,8 @@ import ssl
 
 class MongoDB:
     
-    ''' A MongoDB client that binds class attributes to MongoCollection instances,
-        allowing for easy encoding/decoding of python objects into the database.
+    ''' A MongoDB client that interfaces to different MongoCollection instances,
+        allowing for easy access into the database.
     '''
     
     def __init__(self):
@@ -44,7 +33,7 @@ class MongoDB:
         mongo_client = pymongo.MongoClient(MONGO_URI, ssl_cert_reqs=ssl.CERT_NONE)
         self.mongo_client = mongo_client
         
-        # bind collections
+        # collections
         self.transactions = MongoCollection(self.mongo_client, "transactions")
         self.customers = MongoCollection(self.mongo_client, "customers")
     
@@ -57,7 +46,7 @@ class MongoDB:
 
 class MongoCollection:
     
-    ''' This class controls encoding/decoding python objects as BSON data in MongoDB. '''
+    ''' This class controls the interaction in MongoDB. '''
     
     def __init__(self, mongo_client: pymongo.MongoClient, name: str):
         
@@ -82,36 +71,9 @@ class MongoCollection:
         result = self.collection.find_one(*args, **kwargs)
         return None if not result else result
 
-    def count(self, *args, **kwargs):
-        ''' return number of objects in collection. '''
-        
-        result = self.collection.count()
-        #new documentation for count()
-
-        return None if not result else result
     
     def find_by_id(self, id: Union[str, ObjectId]):
         ''' return a single object matching :id:. '''
         
         return self.find_one({"_id": ObjectId(id)})
-    
-    # def find_by_ids(self, ids: List[Union[str, ObjectId]]) -> List:
-    #     ''' return an array of objects matching the provided :ids: array. '''
-        
-    #     ids = [ObjectId(id) for id in ids]
-    #     return sorted(self.find({"_id": {"$in": ids}}), key=lambda obj: ids.index(obj.id))
-    
-    # def await_update(self, id: ObjectId, timeout: int = 15):
-    #     ''' wait for object with :id: to be updated in the database (or timeout). '''
-
-    #     timeout = time() + timeout
-    #     with self.collection.watch([{"$match": {"$and": [{"documentKey._id": ObjectId(id)}, {"operationType": "update"}]}}], full_document="updateLookup") as stream:
-    #         while stream.alive:
-    #             change = stream.try_next()
-    #             if change is not None:
-    #                 return self.object_type.from_bson(change["fullDocument"])
-    #             elif timeout < time():
-    #                 raise TimeoutError()
-    #             elif stream.alive:
-    #                 sleep(0.1)
 

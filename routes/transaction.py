@@ -9,19 +9,22 @@ from flask import jsonify, Response
 
 
 def create(transaction_request):
-    ''' Store customer transaction to mongo '''
+    '''
+    Input: transaction_request-(request.form)
+    '''
 
 
     fast_customer_id = transaction_request.form["customer_id"]
 
+    # open database connection
     with MongoDB() as mongo_client:
         fast_customer_object = mongo_client.customers.find_by_id(fast_customer_id)
 
-
-    
+    # Use Fast customer id to get customer spending limit
     customer_object = find_customer(fast_customer_object['braintree']['customer_id'])
     customer_spending_limit = fast_customer_object['braintree']["customer_spending_limit"]
 
+    # Check if request amount is within limits
     if float(transaction_request.form['amount']) > float(customer_spending_limit):
         error_dict = {
             "error_message": "Transaction Amount: {} Exceeds Limit: {}".format(transaction_request.form['amount'], customer_spending_limit),
@@ -29,6 +32,7 @@ def create(transaction_request):
             }
     
     else: 
+        # transact uses braintree gateway to process the transaction
         data = transact({
             'amount': transaction_request.form['amount'],
             'payment_method_nonce': transaction_request.form['payment_method_nonce'],
@@ -50,16 +54,14 @@ def create(transaction_request):
             braintree_transaction_amount = float(data.transaction.amount)
 
             # open database connection
-            with MongoDB() as mongo_client: # add the transaction to the collection
+            with MongoDB() as mongo_client: 
                 transaction_pair = {
                     "braintree":{
                         "braintree_transaction_id":braintree_transaction_id,
                         "braintree_transaction_amount":braintree_transaction_amount
-                    },
-                    "stripe":{
-
                     }
                 }
+            #Store braintree's customer transaction to mongo
             transaction_object = mongo_client.transactions.insert_one(transaction_pair)
     
 

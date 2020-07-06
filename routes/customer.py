@@ -12,8 +12,11 @@ from gateway import generate_client_token, transact, find_transaction, find_cust
 from flask import jsonify, Response
 
 def create(customer_request):
-    ''' Store customer transaction to mongo '''
+    ''' 
+    Input:customer_request (request.form)
+    '''
 
+    # customer() uses braintree gateway to create a customer
     braintree_data = customer({
             "first_name": customer_request.form['first_name'],
             "last_name":  customer_request.form['last_name'],
@@ -22,6 +25,7 @@ def create(customer_request):
             }
         })
 
+    # stripe_customer() uses stripe gateway to create a customer
     stripe_data = stripe_customer(
             "{} {}".format(customer_request.form['first_name'], customer_request.form['last_name']),
             customer_request.form['spending_limit'] if customer_request.form['spending_limit'] else 0
@@ -36,6 +40,8 @@ def create(customer_request):
             }
     else:
         error_dict = {}
+
+        # customer_pair makes up the Fast Customer record
         customer_pair = {
             "braintree":{
                         "customer_id": braintree_data.customer.id,
@@ -52,7 +58,8 @@ def create(customer_request):
         }
         
         # open database connection
-        with MongoDB() as mongo_client: # add the customer to the collection
+        with MongoDB() as mongo_client: 
+            # add the customer to the customers collection
             customer_object = mongo_client.customers.insert_one(customer_pair)
 
     customer_response = {
@@ -67,20 +74,23 @@ def create(customer_request):
 
 
 def update(customer_request):
-    ''' Store customer transaction to mongo '''
-    customer_id = customer_request.args["customer_id"]
+    ''' 
+    Input: customer_request -(request.args)
+    '''
+    # fast_customer_id is sent from the update html page
+    fast_customer_id = customer_request.args["customer_id"]
 
     updated_first_name=customer_request.args["first_name"]
     updated_last_name=customer_request.args["last_name"]
     updated_spending_limit=customer_request.args["spending_limit"]
 
     with MongoDB() as mongo_client:
-        customer_object = mongo_client.customers.find_by_id(customer_id)
-    
-
+        # customer_object contains the braintree and stripe customer pair
+        customer_object = mongo_client.customers.find_by_id(fast_customer_id)
         braintree_id = customer_object['braintree']['customer_id']
         stripe_id = customer_object['stripe']['customer_id']
 
+    #update_params creates the payload that has updated customer data
     update_params = {
                 "first_name": updated_first_name,
                 "last_name": updated_last_name,
@@ -88,17 +98,21 @@ def update(customer_request):
                     "spending_limit": updated_spending_limit
                 }
             }
+
+    # update_customer() uses the braintree gateway to update customer
     braintree_data = update_customer(braintree_id, update_params)
 
+    # update_stripe_customer() uses the stripe gateway to update customer
     stripe_data = update_stripe_customer(
             stripe_id,
             "{} {}".format(customer_request.args['first_name'], customer_request.args['last_name']),
             customer_request.args['spending_limit']
         )
 
+    # New customer data must be updated in the MongoDB customers collection
     with MongoDB() as mongo_client:
         mongo_client.customers.collection.update_one(
-            {"_id": ObjectId(customer_id)},
+            {"_id": ObjectId(fast_customer_id)},
             {"$set": {
                 "braintree":{
                     "customer_id":braintree_id,
@@ -124,14 +138,6 @@ def update(customer_request):
     else:
         error_dict = {}
 
-    # customer_response = {
-    #     "fast_customer_id": None if error_dict else customer_id,
-    #     "braintree_data": {} if error_dict else braintree_data,
-    #     "stripe_data": {} if error_dict else stripe_data,
-    #     "error": error_dict,
-    #     "success": bool(not error_dict)
-    # }
-
     customer_response = {
         "fast_customer_id": None if error_dict else str(customer_object["_id"]),
         "braintree_id": {} if error_dict else braintree_data.customer.id,
@@ -146,10 +152,12 @@ def update(customer_request):
 def retrieve(mongoid=None):
     
     if mongoid:
-        with MongoDB() as mongo_client: # add the customer to the collection
+        with MongoDB() as mongo_client: 
+            # pull single customer from mongodb customers collection
             customer_object_list = [mongo_client.customers.find_by_id(mongoid)]
     else:
         with MongoDB() as mongo_client:
+            # pull all customers from mongodb customers collection
             customer_object_list = mongo_client.customers.find()
 
     return customer_object_list

@@ -6,4 +6,4 @@ services:
     ports:
       - "4567:4567"
     volumes:
-      - .:/braintree_flask_example
+      - .:/braintree_stripe_fast_app
