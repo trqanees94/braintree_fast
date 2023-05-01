@@ -1,4 +1,4 @@
-Flask==1.1.1
+Flask==2.3.2
 braintree>=4.0.0
 stripe>=2.48.0
 MarkupSafe>=0.23
